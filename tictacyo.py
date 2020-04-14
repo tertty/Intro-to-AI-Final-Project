@@ -12,7 +12,7 @@ class graph_map:
         self.board = ["-"] * (board_size * board_size)
         self.total_moves = (board_size * board_size)
         self.total_available_moves = (board_size * board_size)
-        self.next_city = None
+        self.depth_check = False
 
     def computer_win(self):
         new_line = 1
@@ -66,6 +66,12 @@ class graph_map:
                 new_line += 1
         return False
 
+    def full_board(self):
+        for i in self.board:
+            if(i == '-'):
+                return False
+        return True
+
     #Print game board, is there a better way to do this? Yes. Am I going to do it? Probably not.
     def print_game_board(self):
         new_line = 1
@@ -78,75 +84,93 @@ class graph_map:
                 new_line += 1
 
     #Max evaluation value, beep boop
-    def computer_move(self):
+    def computer_move(self, depth):
         new_move = 0
 
-        if(self.total_available_moves == 0):
-            value = 0
-            print("DRAW!")
-            return value
-        elif(self.computer_win()):
-            print("Computer wins!")
+        if((self.depth_check == True) and (depth > 3)):
+            print("TODO")
+
+        if(self.full_board()):
+            #print("COMPUTER DRAW!")
+            return 0
+        elif(self.human_win()):
+            #print("Human wins!")
             #self.print_game_board() Debug
-            return True
+            return 1
         else:
-            value = -1
+            value = float('-inf')
             for i in range(self.total_moves):
                 if(self.board[i] == '-'):
                     self.board[i] = 'X'
-                    human_response = self.human_move()
+                    human_response = self.human_move((depth + 1))
                     self.board[i] = '-'
                 
                     if(human_response > value):
                         value = human_response
                         new_move = i
-                        self.board[new_move] = 'X'
-                    
-        #self.board[new_move] = 'X'
-        #self.total_available_moves -= 1
-        return value
+
+            return new_move
     
     #Min evaluation value, boop beep
-    def human_move(self):
+    def human_move(self, depth):
         new_move = 0
 
-        if(self.total_available_moves == 0):
-            value = 0
-            print("DRAW!")
-            return value
-        elif(self.human_win()):
-            print("Human wins!")
-            return True
+        if((self.depth_check == True) and (depth > 3)):
+            print("TODO")
+
+        if(self.full_board()):
+            #print("HUMAN DRAW!")
+            return 0
+        elif(self.computer_win()):
+            #print("Computer wins!")
+            return -1
         else:
-            value = 1
+            value = float('inf')
             for i in range(self.total_moves):
                 if(self.board[i] == '-'):
                     self.board[i] = 'O'
-                    computer_response = self.computer_move()
+                    computer_response = self.computer_move((depth + 1))
                     self.board[i] = '-'
                 
                     if(computer_response < value):
                         value = computer_response
                         new_move = i
                     
-        #self.board[new_move] = 'O'
-        #self.total_available_moves -= 1
-        return value
+            return new_move
 
 #'main' function
 def tictactoe_homework():
 
     game_board = graph_map(N_ARGS.N)
 
-    while(game_board.total_available_moves != 0):
-        game_board.computer_move()
-        game_board.total_available_moves -= 1
+    if(N_ARGS.N > 3):
+        game_board.depth_check = True
+
+    game_board.board[game_board.computer_move(0)] = 'X'
+    game_board.total_available_moves -= 1
+
+    while(game_board.total_available_moves > 0):
+        print("Moves left:", game_board.total_available_moves)
 
         game_board.print_game_board()
 
-        show_me_your_moves = input("Your move, human>>")
-        game_board.board[int(show_me_your_moves)] = 'O'
+        #show_me_your_moves = input("Your move, human>>")
+        #game_board.board[int(show_me_your_moves)] = 'O'
+        
+        #Human automated move
+        human_move = game_board.human_move(0)
+        print("Human move:", human_move)
+        game_board.board[human_move] = 'O'
         game_board.total_available_moves -= 1
+
+        #Computer automated move
+        computer_move = game_board.computer_move(0)
+        print("Computer move:", computer_move)
+        game_board.board[computer_move] = 'X'
+        game_board.total_available_moves -= 1
+
+    game_board.print_game_board()
+    print("Game over!")
 
 #This calls the 'main'
 if __name__ == "__main__":
