@@ -154,13 +154,14 @@ def tictactoe_homework():
 
         game_board.print_game_board()
 
-        #show_me_your_moves = input("Your move, human>>")
-        #game_board.board[int(show_me_your_moves)] = 'O'
-        
-        #Human automated move
-        human_move = game_board.human_move(0)
-        print("Human move:", human_move)
-        game_board.board[human_move] = 'O'
+        if (N_ARGS.M == "H"):
+            show_me_your_moves = input("Your move, human>>")
+            game_board.board[int(show_me_your_moves)] = 'O'
+        else:    
+            #Human automated move
+            human_move = game_board.human_move(0)
+            print("Human move:", human_move)
+            game_board.board[human_move] = 'O'
         game_board.total_available_moves -= 1
 
         #Computer automated move
@@ -178,6 +179,7 @@ if __name__ == "__main__":
     #Create 'N' argument to capture size of board at run.
     N_PARSER = ArgumentParser()
     N_PARSER.add_argument("--N", type=int, help="Specifies N, size of board NxN")
+    N_PARSER.add_argument("--M", type=str, help="Specifies whether the game should be (C)omputer vs Computer or (H)uman vs Computer")
     N_ARGS = N_PARSER.parse_args()
 
     tictactoe_homework()
