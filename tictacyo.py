@@ -88,15 +88,15 @@ class graph_map:
         new_move = 0
 
         if((self.depth_check == True) and (depth > 3)):
-            print("TODO")
+            return 1
 
         if(self.full_board()):
             #print("COMPUTER DRAW!")
             return 0
-        elif(self.human_win()):
+        elif(self.computer_win()):
             #print("Human wins!")
             #self.print_game_board() Debug
-            return 1
+            return -1
         else:
             value = float('-inf')
             for i in range(self.total_moves):
@@ -116,14 +116,14 @@ class graph_map:
         new_move = 0
 
         if((self.depth_check == True) and (depth > 3)):
-            print("TODO")
+            return -1
 
         if(self.full_board()):
             #print("HUMAN DRAW!")
             return 0
-        elif(self.computer_win()):
+        elif(self.human_win()):
             #print("Computer wins!")
-            return -1
+            return 1
         else:
             value = float('inf')
             for i in range(self.total_moves):
