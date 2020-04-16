@@ -1,4 +1,5 @@
 # Authors: Taylor Ertrachter, tertrachter2017@my.fit.edu
+# Nicholas Tolentino, ntolentino2017@my.fit.edu
 # Course: CSE 4301, Spring 2020
 # Project: Assignment 2, NxN Tic-Tac-Toe
 
@@ -13,7 +14,8 @@ class graph_map:
         self.total_moves = (board_size * board_size)
         self.total_available_moves = (board_size * board_size)
         self.depth_check = False
-
+        
+    #Checks to see in the Computer moves equal to a win (3 in a row)
     def computer_win(self):
         new_line = 1
         diag_list = []
@@ -39,7 +41,8 @@ class graph_map:
                 diag_list.append(self.board[i])
                 new_line += 1
         return False
-
+        
+    #Checks to see in the Human moves equal to a win (3 in a row)
     def human_win(self):
         new_line = 1
         diag_list = []
@@ -66,6 +69,7 @@ class graph_map:
                 new_line += 1
         return False
 
+    #Checks to see if the board is full and if it is then end the game
     def full_board(self):
         for i in self.board:
             if(i == '-'):
@@ -142,10 +146,12 @@ class graph_map:
 def tictactoe_homework():
 
     game_board = graph_map(N_ARGS.N)
-
+    
+    #Checks to see if you are playing on bigger than a 3x3 board
     if(N_ARGS.N > 3):
         game_board.depth_check = True
 
+    #
     game_board.board[game_board.computer_move(0)] = 'X'
     game_board.total_available_moves -= 1
 
