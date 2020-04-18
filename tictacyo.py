@@ -29,7 +29,7 @@ class graph_map:
         if(self.computer_win()):
             print("Computer wins, game over!")
             return True
-        elif(self.human_win()):
+        if(self.human_win()):
             print("Human wins, game over!")
             return True
         return False
@@ -70,11 +70,8 @@ class graph_map:
             if(self.board[i] == 'X'):
                 x_check += 1
 
-        if(self.board[self.total_moves-1] == 'X'):
-            x_check += 1
-
         if(x_check == self.board_size):
-            diagnal_right_answer == True
+            diagnal_right_answer = True
 
         #Diagnal left checks
         diagnal_left_answer = False
@@ -86,7 +83,7 @@ class graph_map:
                 x_check += 1
 
         if(x_check == self.board_size):
-            diagnal_left_answer == True
+            diagnal_left_answer = True
 
         return (vertical_answer or horizontal_answer or diagnal_right_answer or diagnal_left_answer)
         
@@ -126,11 +123,8 @@ class graph_map:
             if(self.board[i] == 'O'):
                 o_check += 1
 
-        if(self.board[self.total_moves-1] == 'O'):
-            o_check += 1
-
         if(o_check == self.board_size):
-            diagnal_right_answer == True
+            diagnal_right_answer = True
 
         #Diagnal left checks
         diagnal_left_answer = False
@@ -144,8 +138,6 @@ class graph_map:
         if(o_check == self.board_size):
             diagnal_left_answer = True
         
-        #print(o_check)
-
         return (vertical_answer or horizontal_answer or diagnal_right_answer or diagnal_left_answer)
 
     #Checks to see if the board is full and if it is then end the game
@@ -228,7 +220,7 @@ def tictactoe_homework():
     game_board = graph_map(N_ARGS.N)
     
     #Checks to see if you are playing on bigger than a 3x3 board
-    if(N_ARGS.N > 3):
+    if(N_ARGS.N > 5):
         game_board.depth_check = True
 
     #
