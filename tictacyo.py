@@ -19,10 +19,10 @@ class graph_map:
         new_line = 1
         for i in range(self.total_moves):
             if(new_line == self.board_size):
-                print(i)
+                print(i, ' ')
                 new_line = 1
             else:
-                print(i, end='')
+                print(i, ' ', end='')
                 new_line += 1
         
     def check_for_win(self):
@@ -159,7 +159,7 @@ class graph_map:
                 new_line += 1
 
     #Max evaluation value, beep boop
-    def computer_move(self, depth):
+    def computer_move(self, depth, alpha, beta):
         new_move = 0
 
         if((self.depth_check == True) and (depth > 3)):
@@ -169,25 +169,30 @@ class graph_map:
             #print("COMPUTER DRAW!")
             return 0
         elif(self.computer_win()):
-            #print("Human wins!")
+            #print("Computer wins!")
             #self.print_game_board()
-            return -1
+            return 1
         else:
             value = float('-inf')
             for i in range(self.total_moves):
                 if(self.board[i] == '-'):
                     self.board[i] = 'X'
-                    human_response = self.human_move((depth + 1))
+                    human_response = self.human_move((depth + 1), alpha, beta)
                     self.board[i] = '-'
                 
                     if(human_response > value):
                         value = human_response
                         new_move = i
 
+                    alpha = max(alpha, value)
+
+                    if beta <= alpha:
+                        break
+
             return new_move
     
     #Min evaluation value, boop beep
-    def human_move(self, depth):
+    def human_move(self, depth, alpha, beta):
         new_move = 0
 
         if((self.depth_check == True) and (depth > 3)):
@@ -197,22 +202,50 @@ class graph_map:
             #print("HUMAN DRAW!")
             return 0
         elif(self.human_win()):
-            #print("Computer wins!")
+            #print("Human wins!")
             #self.print_game_board()
-            return 1
+            return -1
         else:
             value = float('inf')
             for i in range(self.total_moves):
                 if(self.board[i] == '-'):
                     self.board[i] = 'O'
-                    computer_response = self.computer_move((depth + 1))
+                    computer_response = self.computer_move((depth + 1), alpha, beta)
                     self.board[i] = '-'
                 
                     if(computer_response < value):
                         value = computer_response
                         new_move = i
                     
+                    beta = min(beta, value)
+
+                    if beta <= alpha:
+                        break
+                    
             return new_move
+
+    def next_move(self, is_comp):
+
+        best_val = float('-inf')
+        best_move = 0
+
+        for i in range(self.total_moves):
+            if(self.board[i] == '-'):
+
+                if(is_comp):
+                    self.board[i] = 'X'
+                    response = self.computer_move(0, float('-inf'), float('inf'))
+                else:
+                    self.board[i] = 'O'
+                    response = self.human_move(0, float('-inf'), float('inf'))
+                self.board[i] = '-'
+            
+                if(response > best_val):
+                    best_val = response
+                    best_move = i
+                
+        return best_move
+
 
 #'main' function
 def tictactoe_homework():
@@ -224,7 +257,7 @@ def tictactoe_homework():
         game_board.depth_check = True
 
     #
-    game_board.board[game_board.computer_move(0)] = 'X'
+    game_board.board[game_board.next_move(True)] = 'X'
     game_board.total_available_moves -= 1
 
     print("Current board:")
@@ -239,7 +272,7 @@ def tictactoe_homework():
             game_board.board[int(show_me_your_moves)] = 'O'
         else:    
             #Human automated move
-            human_move = game_board.human_move(0)
+            human_move = game_board.next_move(False)
             print("Human move:", human_move)
             game_board.board[human_move] = 'O'
         game_board.total_available_moves -= 1
@@ -252,7 +285,7 @@ def tictactoe_homework():
         game_board.print_game_board() 
 
         #Computer automated move
-        computer_move = game_board.computer_move(0)
+        computer_move = game_board.next_move(True)
         print("Computer move:", computer_move)
         game_board.board[computer_move] = 'X'
         game_board.total_available_moves -= 1
