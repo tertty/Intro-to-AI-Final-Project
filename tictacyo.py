@@ -244,9 +244,9 @@ class graph_map:
         if(self.full_board()):
             return 0
         if(self.human_win(False)):
-            return -1
-        if(self.computer_win(False)):
             return 1
+        if(self.computer_win(False)):
+            return -1
 
         if((self.depth_check == True) and (depth > 2)):
             return self.computer_win(True) + self.human_win(True)
