@@ -172,6 +172,8 @@ class graph_map:
             #print("Computer wins!")
             #self.print_game_board()
             return 1
+        elif(self.human_win()):
+            return -1
         else:
             value = float('-inf')
             for i in range(self.total_moves):
@@ -205,6 +207,8 @@ class graph_map:
             #print("Human wins!")
             #self.print_game_board()
             return -1
+        elif(self.computer_win()):
+            return 1
         else:
             value = float('inf')
             for i in range(self.total_moves):
