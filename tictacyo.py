@@ -15,6 +15,13 @@ class graph_map:
         self.total_available_moves = (board_size * board_size)
         self.depth_check = False
 
+    '''
+    When a user is playing against the computer, it helps to show what numbers corrispond with which space.
+    For a board of 3x3, the following hint will be shown to the user to place their 'O':
+    0 1 2
+    3 4 5
+    6 7 8
+    '''
     def show_hint(self):
         new_line = 1
         for i in range(self.total_moves):
@@ -25,6 +32,7 @@ class graph_map:
                 print(i, ' ', end='')
                 new_line += 1
         
+    #This function checks to see if either player has won on the board, return True. Otherwise, return False.
     def check_for_win(self):
         if(self.computer_win()):
             print("Computer wins, game over!")
@@ -34,7 +42,7 @@ class graph_map:
             return True
         return False
 
-    #Checks to see in the Computer moves equal to a win (3 in a row)
+    #Checks to see in the Computer moves equal to a win (N in a row)
     def computer_win(self):
 
         #Vertical checks
@@ -61,7 +69,12 @@ class graph_map:
                 horizontal_answer = True
             x_check = 0
 
-        #Diagnal right checks
+        '''
+        Diagnal right checks i.e.
+        X--
+        -X-
+        --X
+        '''
         diagnal_right_answer = False
 
         x_check = 0
@@ -73,7 +86,12 @@ class graph_map:
         if(x_check == self.board_size):
             diagnal_right_answer = True
 
-        #Diagnal left checks
+        '''
+        Diagnal left checks i.e.
+        --X
+        -X-
+        X--
+        '''
         diagnal_left_answer = False
 
         x_check = 0
@@ -87,7 +105,7 @@ class graph_map:
 
         return (vertical_answer or horizontal_answer or diagnal_right_answer or diagnal_left_answer)
         
-    #Checks to see in the Human moves equal to a win (3 in a row)
+    #Checks to see in the Human moves equal to a win (N in a row)
     def human_win(self):
 
         #Vertical checks
@@ -114,7 +132,12 @@ class graph_map:
                 horizontal_answer = True
             o_check = 0
 
-        #Diagnal right checks
+        '''
+        Diagnal right checks i.e.
+        O--
+        -O-
+        --O
+        '''
         diagnal_right_answer = False
 
         o_check = 0
@@ -126,7 +149,12 @@ class graph_map:
         if(o_check == self.board_size):
             diagnal_right_answer = True
 
-        #Diagnal left checks
+        '''
+        Diagnal left checks i.e.
+        --X
+        -X-
+        X--
+        '''
         diagnal_left_answer = False
 
         o_check = 0
@@ -147,7 +175,7 @@ class graph_map:
                 return False
         return True
 
-    #Print game board, is there a better way to do this? Yes. Am I going to do it? Probably not.
+    #Print game board.
     def print_game_board(self):
         new_line = 1
         for i in range(self.total_moves):
@@ -158,11 +186,13 @@ class graph_map:
                 print(self.board[i], end='')
                 new_line += 1
 
-    #Max evaluation value, beep boop
+    #Max evaluation value, computer move.
     def computer_move(self, depth, alpha, beta):
         new_move = 0
 
-        if((self.depth_check == True) and (depth > 3)):
+        if((self.depth_check == True) and (depth > 2)):
+            print("Depth game board:")
+            self.print_game_board()
             return -1
 
         if(self.full_board()):
@@ -189,15 +219,15 @@ class graph_map:
                     alpha = max(alpha, value)
 
                     if beta <= alpha:
-                        break
+                        return new_move
 
             return new_move
     
-    #Min evaluation value, boop beep
+    #Min evaluation value, human move.
     def human_move(self, depth, alpha, beta):
         new_move = 0
 
-        if((self.depth_check == True) and (depth > 3)):
+        if((self.depth_check == True) and (depth > 2)):
             return 1
 
         if(self.full_board()):
@@ -224,7 +254,7 @@ class graph_map:
                     beta = min(beta, value)
 
                     if beta <= alpha:
-                        break
+                        return new_move
                     
             return new_move
 
@@ -254,22 +284,30 @@ class graph_map:
 #'main' function
 def tictactoe_homework():
 
+    #Create a new game board of size N, specified by user.
     game_board = graph_map(N_ARGS.N)
     
-    #Checks to see if you are playing on bigger than a 3x3 board
-    if(N_ARGS.N > 5):
+    #Checks to see if you are playing on bigger than a 3x3 board, if you are
+    #there needs to be a cutoff at ply=3.
+    if(N_ARGS.N > 3):
         game_board.depth_check = True
 
-    #
+    #Start the game with the computer making the first move. Total moves availble needs to be decreased.
     game_board.board[game_board.next_move(True)] = 'X'
     game_board.total_available_moves -= 1
 
+    #Print board after move.
     print("Current board:")
     game_board.print_game_board()
 
+    #While there are still moves available (not a draw), play the game.
     while(game_board.total_available_moves > 0):
+
+        #How many possible moves are left after a player moves.
         print("Moves left:", game_board.total_available_moves)
 
+        #If the game is run with the "Human" arugment, let the user play. Otherwise call the automated
+        #move function and have the computer play itself.
         if (N_ARGS.M == "H"):
             game_board.show_hint()
             show_me_your_moves = input("Your move, human>>")
@@ -279,12 +317,16 @@ def tictactoe_homework():
             human_move = game_board.next_move(False)
             print("Human move:", human_move)
             game_board.board[human_move] = 'O'
+        #Total moves need to be decreated
         game_board.total_available_moves -= 1
+
+        #Check to see that after the play was made, there is a winner.
         if(game_board.check_for_win()):
             print("Final board:")
             game_board.print_game_board()
             return
 
+        #Print board after move.
         print("Current board:")
         game_board.print_game_board() 
 
@@ -293,16 +335,21 @@ def tictactoe_homework():
         print("Computer move:", computer_move)
         game_board.board[computer_move] = 'X'
         game_board.total_available_moves -= 1
+
+        #Check to see that after the play was made, there is a winner.
         if(game_board.check_for_win()):
             print("Final board:")
             game_board.print_game_board()
             return 
 
+        #Print board after move.
         print("Current board:")
         game_board.print_game_board() 
 
+    #Whenever the game is over from no more moves left, print the final board.
     print("Final board:")
     game_board.print_game_board()
+    #There may have been a user that won in the last move, make sure this isn't the case.
     if(not game_board.check_for_win()): 
         print("Draw, game over!")
 
