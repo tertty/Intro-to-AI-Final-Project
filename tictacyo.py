@@ -34,16 +34,18 @@ class graph_map:
         
     #This function checks to see if either player has won on the board, return True. Otherwise, return False.
     def check_for_win(self):
-        if(self.computer_win()):
+        if(self.computer_win(False)):
             print("Computer wins, game over!")
             return True
-        if(self.human_win()):
+        if(self.human_win(False)):
             print("Human wins, game over!")
             return True
         return False
 
     #Checks to see in the Computer moves equal to a win (N in a row)
-    def computer_win(self):
+    def computer_win(self, check_score):
+
+        score = 0
 
         #Vertical checks
         vertical_answer = False
@@ -52,6 +54,7 @@ class graph_map:
             x_check = 0
             for j in range(self.board_size):
                 if(self.board[k+j] == 'X'):
+                    score += 1
                     x_check += 1
             if(x_check == self.board_size):
                 vertical_answer = True
@@ -65,6 +68,7 @@ class graph_map:
             for j in range(0,self.total_moves,self.board_size):
                 if(self.board[i+j] == 'X'):
                     x_check += 1
+                    score += 1
             if(x_check == self.board_size):
                 horizontal_answer = True
             x_check = 0
@@ -81,6 +85,7 @@ class graph_map:
 
         for i in range(0,self.total_moves, self.board_size+1):
             if(self.board[i] == 'X'):
+                score += 1
                 x_check += 1
 
         if(x_check == self.board_size):
@@ -98,15 +103,21 @@ class graph_map:
 
         for i in range(self.board_size-1,self.total_moves-(self.board_size-1), self.board_size-1):
             if(self.board[i] == 'X'):
+                score += 1
                 x_check += 1
 
         if(x_check == self.board_size):
             diagnal_left_answer = True
 
-        return (vertical_answer or horizontal_answer or diagnal_right_answer or diagnal_left_answer)
+        if(check_score):
+            return score
+        else:
+            return (vertical_answer or horizontal_answer or diagnal_right_answer or diagnal_left_answer)
         
     #Checks to see in the Human moves equal to a win (N in a row)
-    def human_win(self):
+    def human_win(self, check_score):
+
+        score = 0
 
         #Vertical checks
         vertical_answer = False
@@ -115,6 +126,7 @@ class graph_map:
             o_check = 0
             for j in range(self.board_size):
                 if(self.board[k+j] == 'O'):
+                    score -= 1
                     o_check += 1
             if(o_check == self.board_size):
                 vertical_answer = True
@@ -127,6 +139,7 @@ class graph_map:
             o_check = 0
             for j in range(0,self.total_moves,self.board_size):
                 if(self.board[i+j] == 'O'):
+                    score -= 1
                     o_check += 1
             if(o_check == self.board_size):
                 horizontal_answer = True
@@ -144,6 +157,7 @@ class graph_map:
 
         for i in range(0,self.total_moves, self.board_size+1):
             if(self.board[i] == 'O'):
+                score -= 1
                 o_check += 1
 
         if(o_check == self.board_size):
@@ -161,12 +175,16 @@ class graph_map:
 
         for i in range(self.board_size-1,self.total_moves-(self.board_size-1), self.board_size-1):
             if(self.board[i] == 'O'):
+                score -= 1
                 o_check += 1
 
         if(o_check == self.board_size):
             diagnal_left_answer = True
         
-        return (vertical_answer or horizontal_answer or diagnal_right_answer or diagnal_left_answer)
+        if(check_score):
+            return score
+        else:
+            return (vertical_answer or horizontal_answer or diagnal_right_answer or diagnal_left_answer)
 
     #Checks to see if the board is full and if it is then end the game
     def full_board(self):
@@ -190,73 +208,67 @@ class graph_map:
     def computer_move(self, depth, alpha, beta):
         new_move = 0
 
-        if((self.depth_check == True) and (depth > 2)):
-            print("Depth game board:")
-            self.print_game_board()
-            return -1
-
         if(self.full_board()):
-            #print("COMPUTER DRAW!")
             return 0
-        elif(self.computer_win()):
-            #print("Computer wins!")
-            #self.print_game_board()
+        if(self.computer_win(False)):
             return 1
-        elif(self.human_win()):
+        if(self.human_win(False)):
             return -1
-        else:
-            value = float('-inf')
-            for i in range(self.total_moves):
-                if(self.board[i] == '-'):
-                    self.board[i] = 'X'
-                    human_response = self.human_move((depth + 1), alpha, beta)
-                    self.board[i] = '-'
-                
-                    if(human_response > value):
-                        value = human_response
-                        new_move = i
 
-                    alpha = max(alpha, value)
+        if((self.depth_check == True) and (depth > 2)):
+            return self.computer_win(True) + self.human_win(True)
 
-                    if beta <= alpha:
-                        return new_move
+        value = float('-inf')
+        for i in range(self.total_moves):
+            if(self.board[i] == '-'):
+                self.board[i] = 'X'
+                human_response = self.human_move((depth + 1), alpha, beta)
+                self.board[i] = '-'
+            
+                if(human_response > value):
+                    value = human_response
+                    new_move = i
 
-            return new_move
+                #Pruning
+                alpha = max(alpha, value)
+
+                if beta <= alpha:
+                    return new_move
+
+        return new_move
     
     #Min evaluation value, human move.
     def human_move(self, depth, alpha, beta):
         new_move = 0
 
-        if((self.depth_check == True) and (depth > 2)):
-            return 1
-
         if(self.full_board()):
-            #print("HUMAN DRAW!")
             return 0
-        elif(self.human_win()):
-            #print("Human wins!")
-            #self.print_game_board()
+        if(self.human_win(False)):
             return -1
-        elif(self.computer_win()):
+        if(self.computer_win(False)):
             return 1
-        else:
-            value = float('inf')
-            for i in range(self.total_moves):
-                if(self.board[i] == '-'):
-                    self.board[i] = 'O'
-                    computer_response = self.computer_move((depth + 1), alpha, beta)
-                    self.board[i] = '-'
-                
-                    if(computer_response < value):
-                        value = computer_response
-                        new_move = i
-                    
-                    beta = min(beta, value)
 
-                    if beta <= alpha:
-                        return new_move
-                    
-            return new_move
+        if((self.depth_check == True) and (depth > 2)):
+            return self.computer_win(True) + self.human_win(True)
+
+        value = float('inf')
+        for i in range(self.total_moves):
+            if(self.board[i] == '-'):
+                self.board[i] = 'O'
+                computer_response = self.computer_move((depth + 1), alpha, beta)
+                self.board[i] = '-'
+            
+                if(computer_response < value):
+                    value = computer_response
+                    new_move = i
+                
+                #Pruning
+                beta = min(beta, value)
+
+                if beta <= alpha:
+                    return new_move
+                
+        return new_move
 
     def next_move(self, is_comp):
 
